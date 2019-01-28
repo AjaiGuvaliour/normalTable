@@ -1,0 +1,73 @@
+
+    <div  [ngClass]="searchVisible ? 'dialog' : 'dialog_none'">
+        <div>
+        <div class="container">
+        <h3 class="align-center">Dynamic Search</h3>
+        <span class="pull-right maticon"><i class="fa fa-hand-rock-o" aria-hidden="true"></i></span>
+        </div>
+        <div class="container"> 
+        <button class="button_add pull-left btn btn-light"  (click)="dynamicSearch()"><i class="fas fa-plus"></i></button>
+        <button class="button_add pull-right btn btn-light" (click)="searchVisible = !searchVisible"><i class="fas fa-minus"></i></button>
+        </div>
+        </div>
+        <div   #dynamicSearchOption  class="search_fields" id="search_fieldId">
+         
+        </div>
+        <div class="find">
+        <button #findSearch class="btn btn-light" (click)="find(findSearch)" id="findSearch" ><i class="fa fa-search-plus"></i></button>
+        <button  #resetSearch class="btn btn-light" (click)="refresh(resetSearch)" id="resetSearch" ><i class="fas fa-redo"></i></button>
+       
+        </div>
+        </div>
+    
+        <div [ngClass]="sortVisible ? 'dialog' : 'dialog_none'">
+        <div>
+        <div class="container">
+        <h3 class="align-center  ">Dynamic Sort</h3>
+         <span class="pull-right maticon"><i class="fa fa-hand-rock-o" aria-hidden="true"></i></span>
+        </div>
+        <div class="container"> 
+        <button class="button_add pull-left btn btn-light" (click)="dynamicSort()"><i class="fas fa-plus"></i></button>
+        <button class="button_add pull-right btn btn-light" (click)="sortVisible = !sortVisible"><i class="fas fa-minus"></i></button>
+        </div>
+        </div>
+        <div #dynamicSortOption class="sort_fields" id="sort_fieldId" >
+         
+        </div>
+        <div class="find">
+        <button  #findSort id="findSort" class="btn btn-light" (click)="find(findSort)"><i class="fa fa-search-plus"></i></button>
+        <button  #resetSort id="resetSort" class="btn btn-light" (click)="refresh(resetSort)"><i class="fas fa-redo"></i></button>
+        </div>
+       </div>
+    
+    
+
+<div class="container">
+       <div class="row btn-grp">
+           <button  class="btn btn-light" (click)="searchVisible = !searchVisible">Search</button>
+           <button  class="btn btn-light" (click)="sortVisible = !sortVisible" >Sort</button>
+           <button  class="btn btn-light"  (click)="groupBy()">{{grouping}}</button>
+           <button class="btn btn-light"  (click)="isSticky()">sticky</button>
+       </div>  
+       <div class="search-results" infiniteScroll  [infiniteScrollDistance]="2"
+       [infiniteScrollThrottle]="50" [scrollWindow]="false" (scrolled)="onScrollDown()"> 
+          <table class="table table-bordered table-fixed" id="datatable">
+            <thead>
+              <tr>
+                <th  class="staticArea rows">R</th>
+                <th *ngFor = 'let key of columns; let columnIndex = index'  [attr.class]="key.name" ><ul><li [innerHTML]="getIndex(columnIndex+1)"></li><li>{{key.name}}</li></ul></th>
+                <th  class="staticArea">Formula Generator</th>
+             </tr> 
+            </thead>
+            <tbody>
+              <tr *ngFor = 'let item of tableDatas; let rowIndex = index' >
+                  <td class="staticArea">{{rowIndex+1}}</td>
+                <td *ngFor = 'let key of columns; let columnIndex = index' [attr.class]="getIndex(columnIndex+1)+''+(rowIndex+1)+' '+ key.name ">{{item[key.name]}}</td>
+                <td class="staticArea">
+                    <input  type="text" placeholder="...." [id]="'formulaGeneratingArea'+rowIndex"  (mouseout)="formulaGenerator($event,rowIndex)"><input readonly style="border: none;" [id]="'formulaTextArea'+rowIndex"  type="text" >
+                </td>
+             </tr>
+             </tbody>  
+           </table>
+       </div>
+</div>
