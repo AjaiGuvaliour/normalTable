@@ -40,15 +40,13 @@
         </div>
        </div>
     
-    
-
 <div class="container">
        <div class="row btn-grp">
            <button  class="btn btn-light" (click)="searchVisible = !searchVisible">Search</button>
            <button  class="btn btn-light" (click)="sortVisible = !sortVisible" >Sort</button>
            <button  class="btn btn-light"  (click)="groupBy()">{{grouping}}</button>
-           <button class="btn btn-light"  (click)="isSticky()">sticky</button>
-       </div>  
+           <ss-multiselect-dropdown class="btn btn-light" [options]="columnsName" [(ngModel)]="optionsModel" (ngModelChange)="isSticky($event)"></ss-multiselect-dropdown>
+        </div>  
        <div class="search-results" infiniteScroll  [infiniteScrollDistance]="2"
        [infiniteScrollThrottle]="50" [scrollWindow]="false" (scrolled)="onScrollDown()"> 
           <table class="table table-bordered table-fixed" id="datatable">
@@ -61,7 +59,7 @@
             </thead>
             <tbody>
               <tr *ngFor = 'let item of tableDatas; let rowIndex = index' >
-                  <td class="staticArea">{{rowIndex+1}}</td>
+                  <td class="staticArea rrIndex">{{rowIndex+1}}</td>
                 <td *ngFor = 'let key of columns; let columnIndex = index' [attr.class]="getIndex(columnIndex+1)+''+(rowIndex+1)+' '+ key.name ">{{item[key.name]}}</td>
                 <td class="staticArea">
                     <input  type="text" placeholder="...." [id]="'formulaGeneratingArea'+rowIndex"  (mouseout)="formulaGenerator($event,rowIndex)"><input readonly style="border: none;" [id]="'formulaTextArea'+rowIndex"  type="text" >

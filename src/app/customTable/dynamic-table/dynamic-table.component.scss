@@ -209,10 +209,24 @@ text-align: center;
 ul{
     list-style-type: none;
 }
-input{
-    width: 100%;
-    border: none;
-    border-bottom: 1px solid grey;
+// input{
+//     width: 100%;
+//     border: none;
+//     border-bottom: 1px solid grey;
+// }
+ :host /deep/ .dropdown {
+    .btn-secondary {
+        color: #212529 !important;
+        background-color: #f9f9f9 !important;
+        border-color: #fbfafa !important;
+    }
+    ul{
+        z-index:111111111;
+    }
+ }
+table th, table td {
+    min-width: 80px;
+    box-sizing: border-box;
 }
 
 thead tr{
@@ -234,6 +248,7 @@ thead tr{
 }
 
 tbody tr{
+
     .staticArea{
             top: 0px;
             left:0px;
@@ -241,11 +256,4 @@ tbody tr{
             background: #f7f4f4;
         
     }
-}
-
-.staticArea1{
-    top: 0px;
-    position: sticky;
-    background: #f7f4f4;
-
 }

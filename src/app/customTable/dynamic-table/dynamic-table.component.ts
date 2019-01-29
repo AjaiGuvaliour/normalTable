@@ -1,14 +1,17 @@
-import { Component, OnInit, Input, ViewChild, ElementRef, Renderer2 } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ElementRef, Renderer2, AfterViewInit } from '@angular/core';
 import * as $ from 'jquery';
+import { IMultiSelectOption } from 'angular-4-dropdown-multiselect';
 @Component({
   selector: 'Jabs-table',
   templateUrl: './dynamic-table.component.html',
   styleUrls: ['./dynamic-table.component.scss']
 })
-export class DynamicTableComponent implements OnInit {
+export class DynamicTableComponent implements OnInit ,AfterViewInit{
 
   @Input() matData = [];
   columns: Array<any> = [];
+  columnsName: Array<any>=[];
+  columnPinningName: Array<any>=[];
   tableDatas: Array<any> = [];
   tabledata_cpy: Array<any>= [];
   fiterdata: Array<any>= [];
@@ -31,10 +34,16 @@ export class DynamicTableComponent implements OnInit {
         name: object,
         label: "Search by " + object
       });
+      this.columnsName.push({id: object,name: object});
+      this.columnPinningName.push(object);
     }
     this.fiterdata = this.matData;
     this.tabledata_cpy = this.matData;
     this.tableDatas = this.matData.slice(0, 20);
+  }
+
+  ngAfterViewInit(){
+
   }
 
   getIndex(index: any) {
@@ -395,7 +404,7 @@ export class DynamicTableComponent implements OnInit {
     );
     this.renderer.setAttribute(button, "value", "-");
     this.renderer.listen(button, "click", () => {
-      this.deleteDom(this.dynamicSearchOption.nativeElement, row.id);
+      this.deleteDom(this.dynamicSortOption.nativeElement, row.id);
     });
     this.renderer.appendChild(row, col1);
     this.renderer.appendChild(row, col2);
@@ -604,15 +613,17 @@ export class DynamicTableComponent implements OnInit {
 
   }
 
-  isSticky(){
-    var bb=['USER','TIME'];
+  isSticky(values){
+   console.log(this.columnPinningName)
+   var res = values.filter( function(n) { return !this.has(n) }, new Set(this.columnPinningName) );
 
-    for(var j=0;j<bb.length;j++){
+console.log(res);
+    for(var j=0;j<values.length;j++){
 
-    for(var i =0; i< document.getElementsByClassName(bb[j]).length;i++){
-        this.renderer.addClass(document.getElementsByClassName(bb[j])[i],'staticArea');
-       this.renderer.setStyle(document.getElementsByClassName(bb[j])[i],'left',document.getElementsByClassName(bb[j])[0]["offsetLeft"]+'px');
-        //this.renderer.removeStyle(document.getElementsByClassName(bb[j])[i],'left')
+    for(var i =0; i< document.getElementsByClassName(values[j]).length;i++){
+        this.renderer.addClass(document.getElementsByClassName(values[j])[i],'staticArea');
+       this.renderer.setStyle(document.getElementsByClassName(values[j])[i],'left',document.getElementsByClassName(values[j])[0]["offsetLeft"]+'px');
+       //this.renderer.removeStyle(document.getElementsByClassName(bb[j])[i],'left')
    }
   }
   }
