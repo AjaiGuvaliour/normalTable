@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, ViewChild, ElementRef, Renderer2, AfterViewInit } from '@angular/core';
-import * as $ from 'jquery';
+// import * as $ from 'jquery';
 import { IMultiSelectOption } from 'angular-4-dropdown-multiselect';
 @Component({
   selector: 'Jabs-table',
@@ -28,7 +28,6 @@ export class DynamicTableComponent implements OnInit ,AfterViewInit{
 
   ngOnInit() {
     var objects = this.matData[0];
-    console.log(this.matData)
     for (let object in objects) {
       this.columns.push({
         name: object,
@@ -43,6 +42,7 @@ export class DynamicTableComponent implements OnInit ,AfterViewInit{
   }
 
   ngAfterViewInit(){
+    // $('table').dragtable();
 
   }
 
@@ -471,7 +471,6 @@ export class DynamicTableComponent implements OnInit ,AfterViewInit{
 
 
   refresh(event: any) {
-    console.log(event)
     var refresh = event.id;
     if (refresh == "resetSearch") {
       this.filterData("");
@@ -570,63 +569,98 @@ export class DynamicTableComponent implements OnInit ,AfterViewInit{
   groupBy() {
     this.groupingVisible = ! this.groupingVisible;
 
-    var to = Object.keys(this.matData[0]);
-    function groupTable($rows, startIndex, total) {
+    var obj = Object.keys(this.matData[0]);
+    function groupTable(rows, startIndex, total) {
+      
       if (total === 0) {
         return;
       }
-      var i,
+      var i,tds=[],
         currentIndex = startIndex,
         count = 1,
         lst = [];
-      var tds = $rows.find("td:eq(" + currentIndex + ")");
-      var ctrl = $(tds[0]);
-      lst.push($rows[0]);
+         for(var ind=0; ind < rows.length;ind++){
+          for(var index=0;index<rows[ind].getElementsByTagName("td").length;index++){
+             index == currentIndex ? tds.push(rows[ind].getElementsByTagName("td")[index]) : '';     
+         }
+        }
+      var ctrl = tds[0];
+      lst.push(rows[0]);
       for (i = 1; i <= tds.length; i++) {
-        if (ctrl.text() == $(tds[i]).text()) {
+        var tdsInnerText;
+        if(tds[i]){tdsInnerText=tds[i].innerText}else{tdsInnerText=''}
+        if (ctrl.innerText ==  tdsInnerText) {
           count++;
-          $(tds[i]).addClass("deleted");
-          lst.push($rows[i]);
+          tds[i].classList.add("deleted");
+          lst.push(rows[i]);
         } else {
           if (count > 1) {
-            ctrl.attr("rowspan", count);
-            groupTable($(lst), startIndex + 1, total - 1);
+            ctrl.setAttribute("rowspan", count);
+            groupTable(lst, startIndex + 1, total - 1);
           }
           count = 1;
           lst = [];
-          ctrl = $(tds[i]);
-          lst.push($rows[i]);
+          ctrl = tds[i];
+          lst.push(rows[i]);
         }
       }
     }
-
+    var tableId = document.getElementById("datatable");
     if (!this.groupingVisible) {
+      var tdGroup=[];
       this.grouping="UnGroup";
-      groupTable($("#datatable tr:has(td)"), 1, to.length);
-      $("#datatable .deleted").hide();
+      for(var i = 0 ; i< tableId.getElementsByTagName("tr").length;i++){
+         tableId.getElementsByTagName("tr")[i].children[0].tagName == "TD" ?  tdGroup.push(tableId.getElementsByTagName("tr")[i]) : '';
+      }
+       groupTable(tdGroup,1,obj.length);
+       for(var it=0; it < tableId.getElementsByClassName("deleted").length;it++){
+          tableId.getElementsByClassName("deleted")[it].classList.add("none");
+       }
     }
     else{
         this.grouping="Grouping";
-        $("#datatable .deleted").show();
-        $("#datatable tbody tr td").removeAttr("rowspan");
+        for(var it=0; it< tableId.getElementsByClassName("deleted").length; it++){
+            tableId.getElementsByClassName("deleted")[it].classList.remove("none");
+          }
+        for(var removeAtt=0;removeAtt < tableId.getElementsByTagName("td").length; removeAtt++){
+          tableId.getElementsByTagName("td")[removeAtt].hasAttribute("rowspan") ?   tableId.getElementsByTagName("td")[removeAtt].removeAttribute("rowspan") : '';
+        }
+    
     }
 
   }
+ isSticky(values){
+  var size=0;
+  var unSelectedValues = this.columnPinningName.filter(val => ! values.includes(val));;
+  var overAllValues=[];
+   values.forEach(value=>{overAllValues.push({name:value,type:'selected'})})
+   unSelectedValues.forEach(value=>{overAllValues.push({name:value,type:'unselected'})});
+   var columns=this.columnPinningName;
 
-  isSticky(values){
-   console.log(this.columnPinningName)
-   var res = values.filter( function(n) { return !this.has(n) }, new Set(this.columnPinningName) );
+  overAllValues.sort(function(a, b){
+    return columns.indexOf(a.name) - columns.indexOf(b.name);
+  });
+   for(var j=0;j<overAllValues.length;j++){
 
-console.log(res);
-    for(var j=0;j<values.length;j++){
-
-    for(var i =0; i< document.getElementsByClassName(values[j]).length;i++){
-        this.renderer.addClass(document.getElementsByClassName(values[j])[i],'staticArea');
-       this.renderer.setStyle(document.getElementsByClassName(values[j])[i],'left',document.getElementsByClassName(values[j])[0]["offsetLeft"]+'px');
-       //this.renderer.removeStyle(document.getElementsByClassName(bb[j])[i],'left')
-   }
+    if(overAllValues[j].type == 'selected'){
+      size= size + document.getElementsByClassName(overAllValues[j].name)[0]['offsetWidth'];
+    }
+    for(var i =0; i< document.getElementsByClassName(overAllValues[j].name).length;i++){
+     if(overAllValues[j].type == 'selected'){
+        this.renderer.addClass(document.getElementsByClassName(overAllValues[j].name)[i],'staticArea');
+        if(j==0){
+            this.renderer.setStyle(document.getElementsByClassName(overAllValues[j].name)[i],'left',document.getElementsByClassName("rrIndex")[0]['offsetWidth']+'px');
+          }
+        else{
+           this.renderer.setStyle(document.getElementsByClassName(overAllValues[j].name)[i],'left',size - document.getElementsByClassName(overAllValues[j].name)[0]['offsetWidth']+80+'px');
+         }
+      }
+     else{
+       this.renderer.removeClass(document.getElementsByClassName(overAllValues[j].name)[i],'staticArea');
+       this.renderer.removeStyle(document.getElementsByClassName(overAllValues[j].name)[i],'left');
+     }
+    }
   }
-  }
-
+ }
   
 }
